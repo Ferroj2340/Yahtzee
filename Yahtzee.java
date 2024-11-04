@@ -17,6 +17,20 @@ public class Yahtzee {
         return numPlayers;
     }
 
+    ///Game type
+    public static int getNumberOfDice() {
+        Scanner scanner = new Scanner(System.in);
+        int numDice;
+        do {
+            System.out.print("Choose game type (enter '5' for 5-dice or enter '6' for 6-dice: ");
+            numDice = scanner.nextInt();
+            if (numDice != 5 && numDice != 6) {
+                System.out.println("Invalid choice. Please enter 5 or 6.");
+            }
+        } while (numDice != 5 && numDice != 6);
+        return numDice;
+    }
+
     // Update the scorecards for the players
     public static int[][] initializeScorecards(int numPlayers) {
         int[][] scorecards = new int[numPlayers][13];
@@ -28,11 +42,11 @@ public class Yahtzee {
         return scorecards;
     }
 
-     // Roll a number between 1 and 6
-    public static int[] rollDice() {
+     // Roll a number of dice
+     public static int[] rollDice(int numDice) {
         Random rand = new Random();
-        int[] dice = new int[5];
-        for (int i = 0; i < 5; i++) {
+        int[] dice = new int[numDice];
+        for (int i = 0; i < numDice; i++) {
             dice[i] = rand.nextInt(6) + 1; 
         }
         return dice;
@@ -48,17 +62,17 @@ public class Yahtzee {
     }
 
     // Choosing which dice to keep
-    public static int[] rerollDice(int[] dice) {
+    public static int[] rerollDice(int[] dice, int numDice) {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter which indices of dice to keep (separate it by space, for example '0 2 4'), or press 'Enter' to reroll all: ");
         String input = scanner.nextLine();
         if (input.isEmpty()) {
-            return rollDice();
+            return rollDice(numDice);
         }
         String[] indices = input.split(" ");
         for (String indexStr : indices) {
             int index = Integer.parseInt(indexStr);
-            dice[index] = rollDice()[index];
+            dice[index] = rollDice(numDice)[index];
         }
         return dice;
     }
@@ -176,8 +190,11 @@ public class Yahtzee {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Get number of players
+        // Get number of players and 
         int numPlayers = getNumberOfPlayers();
+
+        /// Get dice count
+        int numDice = getNumberOfDice();
 
         // Initialize scorecards
         int[][] scorecards = initializeScorecards(numPlayers);
@@ -187,7 +204,7 @@ public class Yahtzee {
             System.out.println("\nRound " + (round + 1) + ":");
             for (int i = 0; i < numPlayers; i++) {
                 System.out.println("\nPlayer " + (i + 1) + "'s turn:");
-                int[] dice = rollDice();
+                int[] dice = rollDice(numDice);
                 displayDice(dice);
 
                 // Reroll up to 3 rolls
@@ -195,7 +212,7 @@ public class Yahtzee {
                     System.out.print("Would you like to reroll some of the dice? (enter 'yes' or 'no'): ");
                     String answer = scanner.nextLine();
                     if (answer.equalsIgnoreCase("yes")) {
-                        dice = rerollDice(dice);
+                        dice = rerollDice(dice, numDice);
                         displayDice(dice);
                     } else {
                         break;
